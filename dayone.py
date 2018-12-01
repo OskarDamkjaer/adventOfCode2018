@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3
 
-numberList = open('input', 'r').read().split('\n')[:-1]
+numberList = open('inputs/dayone', 'r').read().split('\n')[:-1]
 
 def solve_first():
     total = 0
@@ -20,6 +20,6 @@ def solve_second():
         i += 1
     return total
 
-print(solve_first())
-print(solve_second())
+print("Part one is:", solve_first())
+print("Part two is:", solve_second())
 
