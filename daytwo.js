@@ -1,5 +1,5 @@
 const fs = require('fs');
-file = fs.readFileSync('inputs/daytwo', 'utf8');
+const file = fs.readFileSync('inputs/daytwo', 'utf8');
 
 const inputList = file.split('\n');
 
