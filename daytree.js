@@ -42,6 +42,31 @@ for (let i = 0; i < input.length; i++) {
   }
 }
 
-//console.log(field);
+const notOverlapping = Object.entries(field)
+  .filter(item => item[1] === 1)
+  .reduce((acc, curr) => acc.add(curr[0]), new Set());
 
-console.log(Object.values(field).filter(item => item !== 1).length);
+let pureId = 'NOT FOUND';
+
+for (let i = 0; i < input.length; i++) {
+  let pure = true;
+  const currentInput = parseObj(input[i]);
+  const {id, width, height, inchesFromLeft, inchesFromTop} = currentInput;
+  for (let x = inchesFromLeft; x < inchesFromLeft + width; x++) {
+    for (let y = inchesFromTop; y < inchesFromTop + height; y++) {
+      const spot = x + '#' + y;
+      if (!notOverlapping.has(spot)) {
+        pure = false;
+      }
+    }
+  }
+  if (pure) {
+    pureId = id;
+  }
+}
+
+console.log(
+  'part1 is:',
+  Object.values(field).filter(item => item !== 1).length,
+);
+console.log('part2 is:', pureId);
