@@ -1,4 +1,7 @@
-testData = [
+const fs = require('fs');
+const file = fs.readFileSync('inputs/dayfour', 'utf8');
+
+const testData = [
   '[1518-11-01 00:00] Guard #10 begins shift',
   '[1518-11-01 00:05] falls asleep',
   '[1518-11-01 00:25] wakes up',
@@ -18,7 +21,7 @@ testData = [
   '[1518-11-05 00:55] wakes up',
 ];
 
-const input = testData;
+const input = file.trim().split('\n');
 
 const parseObj = data => {
   const [timestamp, rest] = data.slice(1).split(']');
@@ -55,17 +58,67 @@ const guardList = Object.entries(guards).map(obj => ({
 
 guardList.forEach(guard => {
   guard.list = [];
+  guard.minuteStamps = [];
   for (let i = 0; i < guard.sleep.length; i = i + 2) {
     guard.list.push(
       (guard.sleep[i + 1].timestamp - guard.sleep[i].timestamp) / (1000 * 60),
     );
+    guard.minuteStamps.push({
+      start: parseInt(
+        guard.sleep[i].timestamp
+          .toString()
+          .split(':')[1]
+          .split('.')[0],
+        10,
+      ),
+      end: parseInt(
+        guard.sleep[i + 1].timestamp
+          .toString()
+          .split(':')[1]
+          .split('.')[0],
+        10,
+      ),
+    });
   }
 });
 
 const sleepList = guardList.map(item => ({
-    guard: item.guard,
-    sleepy: item.list.reduce((acc, curr) => acc + curr, 0),
-  }));
+  guard: item.guard,
+  sleepy: item.list.reduce((acc, curr) => acc + curr, 0),
+  minuteStamps: item.minuteStamps,
+}));
 
+const sleepiest = sleepList.reduce(
+  (acc, curr) => (acc.sleepy > curr.sleepy ? acc : curr),
+  guardList[0],
+);
 
+const getSleepiestMinute = guard => {
+  let bestIndex = 0;
+  let bestTime = 0;
+  for (let i = 0; i < 59; i++) {
+    const sleepTimes = guard.minuteStamps.filter(
+      item => i >= item.start && i < item.end,
+    ).length;
+    if (sleepTimes > bestTime) {
+      best = i;
+      bestTime = sleepTimes;
+    }
+  }
+  return {bestMinute: best, bestTime};
+};
 
+const minuteScores = sleepList.map(item => ({
+  ...item,
+  ...getSleepiestMinute(item),
+}));
+const guardPart2 = minuteScores.reduce(
+  (acc, curr) => (acc.bestTime > curr.bestTime ? acc : curr),
+  sleepList[0],
+);
+
+console.log(
+  'part one:',
+  parseInt(sleepiest.guard, 10) * getSleepiestMinute(sleepiest).bestMinute,
+);
+console.log('part two', parseInt(guardPart2.guard, 10) * guardPart2.bestMinute);
